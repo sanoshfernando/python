@@ -3,6 +3,8 @@ import time
 from food import Food
 from snake import Snake
 from scoreboard import Scoreboard
+
+
 screen = Screen()
 screen.setup(600,600)
 screen.bgcolor("black")
@@ -28,6 +30,7 @@ while game_is_on:
         food.refresh()
         snake.extend()
         scoreboard.increase_score()
+
 #detect wall collision
     if snake.head.xcor()>280 or snake.head.xcor()<-280 or snake.head.ycor()>280 or snake.head.ycor()<-280:
         game_is_on=False
