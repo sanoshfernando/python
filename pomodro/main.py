@@ -42,7 +42,7 @@ def countdown(sec_countdown):
     min_countdown = sec_countdown//60
     canvas.itemconfig(time_text, text=f"{min_countdown}:{sec_countdown%60:02d}")
     if sec_countdown>0:
-        window.after(1,countdown,sec_countdown-1)
+        window.after(10,countdown,sec_countdown-1)
     else:
         window.attributes('-topmost', True)
         window.update()
