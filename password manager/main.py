@@ -1,6 +1,7 @@
 from tkinter import *
 from tkinter import messagebox
 import pyperclip
+import json
 
 window = Tk()
 window.title("Password Manager")
@@ -39,6 +40,12 @@ def save():
     email = email_entry.get()
     password = password_entry.get()
     website = website_entry.get()
+    new_data = {
+        website:{
+            "email:" : email,
+            "password:" : password,
+        }
+    }
 
     if len(password) == 0 or len(website)==0:
         messagebox.showinfo(title="Oops", message="Please make sure non of the fields are empty")
@@ -47,13 +54,32 @@ def save():
                                        message=f"These are the details entered: \nEmail:{email}\n"
                                                f"Password: {password}\nIs it ok to save?")
         if is_ok:
-            with open("data.txt", "a") as text_file:
-                text_file.write(f"{website} | {email} | {password}\n")
+            try:
+                with open("data.json","r") as data_file:
+                    data = json.load(data_file)
+            except FileNotFoundError:
+                with open("data.json","w") as data_file:
+                    json.dump(new_data,data_file, indent=4)
+            else:
+                data.update(new_data)
+                with open("data.json","w") as data_file:
+                    json.dump(data,data_file, indent=4)
+            finally:
                 password_entry.delete(0, END)
                 website_entry.delete(0, END)
 
+# ---------------------------- SEARCH ------------------------------- #
 
-
+def search():
+    website = website_entry.get()
+    try:
+        with open("data.json", "r") as data_file:
+            data = json.load(data_file)
+            email = data[website]["email:"]
+            password = data[website]["password:"]
+            messagebox.showinfo(title=f"{website}",message=f"email: {email}\npassword: {password}")
+    except KeyError:
+        messagebox.showinfo(title=f"Oops", message=f"No data file found")
 # ---------------------------- UI SETUP ------------------------------- #
 canvas = Canvas(height=200, width=200)
 logo_img = PhotoImage(file="logo.png")
@@ -69,7 +95,7 @@ password_label = Label(text="Password")
 password_label.grid(row= 3, column=0)
 
 #text box
-website_entry = Entry(width= 52)
+website_entry = Entry(width= 33)
 website_entry.focus()
 website_entry.grid(row= 1,column=1,columnspan=2,sticky="w")
 email_entry = Entry(width=52)
@@ -78,6 +104,8 @@ email_entry.grid(row= 2,column=1,columnspan=2,sticky="w")
 password_entry = Entry(width=33)
 password_entry.grid(row=3, column=1,sticky="w")
 #Button
+search_button= Button(text="Search",width=15,command=search)
+search_button.grid(row=1, column=2,sticky="w")
 password_button= Button(text="Generate Password",command=write_password)
 password_button.grid(row=3, column=2,sticky="w")
 add_button = Button(text="Add",width=44, command=save)
